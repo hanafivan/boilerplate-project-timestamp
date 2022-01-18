@@ -30,13 +30,16 @@ app.get("/api/:date_string", function (req, res) {
   //
   const dateParams = req.params.date_string;
   let result;
-  if (moment(dateParams, 'YYYY-MM-DD', true)) {
+  const isValidDD = moment(dateParams, 'YYYY-MM-DD', true);
+  const isValidUnix = dateParams.length === 13;
+  if (isValidDD) {
     result = {utc : moment(dateParams).format('dddd, DD MMM YYYY')};
   }
 
-  if (dateParams.length === 13) {
+  if (isValidUnix) {
     result = {unix : parseInt(dateParams)};
-  } else {
+  } 
+  if (!isValidDD && !isValidUnix) {
     result = { error : "Invalid Date" };
   }
   res.json(result);
