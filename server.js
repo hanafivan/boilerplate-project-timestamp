@@ -27,22 +27,24 @@ app.get("/api/hello", function (req, res) {
 
 // your first API endpoint... 
 app.get("/api/:date_string", function (req, res) {
-  //
-  const dateParams = req.params.date_string;
-  let result;
-  const isValidDD = moment(dateParams, 'YYYY-MM-DD', true);
-  const isValidUnix = dateParams.length === 13;
-  if (isValidDD) {
-    result = {utc : moment(dateParams).format('dddd, DD MMM YYYY')};
-  }
+  let dateString = req.params.date_string;
 
-  if (isValidUnix) {
-    result = {unix : parseInt(dateParams)};
-  } 
-  if (!isValidDD && !isValidUnix) {
-    result = { error : "Invalid Date" };
+  if (!isNaN(Date.parse(dateString))) {
+    let dateObject = new Date(dateString);
+    res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
+  } else if (/\d{5,}/.test(dateString)) {
+      let dateInt = parseInt(dateString);
+      res.json({ unix: dateInt, utc: new Date(dateInt).toUTCString() });
+  } else {
+    res.json({ error: "Invalid Date" });
   }
-  res.json(result);
+});
+
+app.get('/api', function(req, res){
+  res.json({
+      unix : new Date().getTime(),
+      utc : new Date().toUTCString()
+    })
 });
 
 
